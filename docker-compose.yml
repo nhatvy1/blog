@@ -1,0 +1,64 @@
+version: "3.8"
+
+networks: 
+  traffic-tool:
+    driver: bridge
+
+services:
+  mongodb:
+    image: mongo:5.0.15
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+      MONGO_INITDB_DATABASE: traffic
+    ports:
+      - 27018:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - traffic-tool
+
+  be:
+    container_name: be
+    depends_on:
+      - mongodb
+    build: 
+      context: ./be
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - "5000:5000"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./be:/app
+      - /app/node_modules
+    networks:
+      - traffic-tool
+
+  fe:
+    container_name: fe
+    depends_on:
+      - be
+    build:
+      context: ./fe
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - "3001:3001"
+    stdin_open: true
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+    tty: true
+    volumes:
+      - ./fe:/app
+      - /app/node_modules
+      - /app/dist
+    networks:
+      - traffic-tool
+
+volumes:
+  mongodb_data_container:

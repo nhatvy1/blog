@@ -1,0 +1,15 @@
+{
+  "name": "traffic_tool",
+  "version": "1.0.0",
+  "description": "traffic_tool",
+  "scripts": {
+    "build:be": "docker-compose build be",
+    "build:fe": "docker-compose build fe",
+    "start:db": "docker-compose up mongodb",
+    "start:be": "docker-compose up be --renew-anon-volumes",
+    "start:fe": "docker-compose up fe --renew-anon-volumes",
+    "clean": "docker-compose down -v"
+  },
+  "author": "",
+  "license": "ISC"
+}
